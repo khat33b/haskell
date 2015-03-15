@@ -42,4 +42,4 @@ pack (x:xs) = if x `elem` (head (pack xs))
               else [x]:(pack xs)
 
 encode :: Eq a => [a] -> [(Int, a)]
-encode xs = map (\x -> (length x,head x)) (group xs)              
+encode xs = map (\x -> (length x,head x)) (group xs)
