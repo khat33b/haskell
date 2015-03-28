@@ -1,0 +1,1 @@
+sumMult m n limit = sum [x | x<-[1..limit], x`mod`m==0 or x`mod`n==0]
