@@ -1,7 +1,6 @@
 import Control.Monad
 import Data.List
 import Data.Ord (comparing)
-import Control.Arrow
 
 not' :: Bool -> Bool
 not' False = True
@@ -55,9 +54,16 @@ gray n = let xs = gray (n-1) in map ('0':) xs ++ map ('1':) (reverse xs)
 data HTree a = Leaf a | Branch (HTree a) (HTree a)
                 deriving Show
 
-huffmanTree :: (Ord w, Num w) => [(w, a)] -> HTree a
-huffmanTree = snd . head . until (null.tail) hstep
-                  . sortBy (comparing fst) . map (second Leaf)
+huffman :: (Ord a, Ord w, Num w) => [(a,w)] -> [(a,String)]
+huffman freq = sortBy (comparing fst) $ serialize $
+        htree $ sortBy (comparing fst) $ [(w, Leaf x) | (x,w) <- freq]
 
-hstep :: (Ord a, Num a) => [(a, HTree b)] -> [(a, HTree b)]
-hstep ((w1,t1):(w2,t2):wts) = insertBy (comparing fst) (w1 + w2, Branch t1 t2) wts
+htree :: (Ord a, Num a) => [(a, HTree b)] -> HTree b
+htree [(_, t)] 				= t
+htree ((w1,t1):(w2,t2):wts) = htree $ insertBy (comparing fst)
+								      (w1 + w2, Branch t1 t2) wts
+
+serialize :: HTree t -> [(t, String)]
+serialize (Branch l r) = [(x, '0':code) | (x, code) <- serialize l] ++
+						 [(x, '1':code) | (x, code) <- serialize r]
+serialize (Leaf x)     = [(x, "")]
